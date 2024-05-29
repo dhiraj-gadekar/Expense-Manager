@@ -16,8 +16,10 @@ Users can get the expenses details made from the time, the budget has been reset
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
+@EnableJpaRepositories
 public class ExpenseManagerApplication {
 
 	public static void main(String[] args) {

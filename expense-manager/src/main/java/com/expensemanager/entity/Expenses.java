@@ -1,6 +1,6 @@
 package com.expensemanager.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +22,9 @@ public class Expenses {
 
     private String item;
 
-    private Date date;
+    private LocalDate date;
 
     private double cost;
+
+    private int monthlyBudgetId;
 }

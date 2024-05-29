@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -25,13 +27,14 @@ import lombok.NoArgsConstructor;
 public class User implements UserDetails {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int userId;
 
     private String username;
 
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<MonthlyBudget> monthsList = new HashSet<>();
 
     @Override

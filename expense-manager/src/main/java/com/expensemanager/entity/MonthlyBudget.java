@@ -6,14 +6,14 @@ import java.util.Set;
 
 import com.expensemanager.utils.Month;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,11 +35,9 @@ public class MonthlyBudget {
 
     @Enumerated(value = EnumType.STRING)
     private Month month;
+   
+    private int userId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @OneToMany
-    private Set<Expenses> expenseSet = new HashSet<>();  
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Expenses> expenses = new HashSet<>();  
 }

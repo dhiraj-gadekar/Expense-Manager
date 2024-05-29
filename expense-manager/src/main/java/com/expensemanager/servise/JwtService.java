@@ -21,17 +21,22 @@ public class JwtService {
     private String SECRET_KEY = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 
     public String extractUsername(String token) {
-
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         return extractClaims(token, (claims)-> claims.getSubject());
     }
 
     public boolean isValid(String token, UserDetails userDetails) {
 
-        String email = extractUsername(token);
-        return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        String username = extractUsername(token);
+        return !isTokenExpired(token) && (username.equals(userDetails.getUsername()));
     }
 
     private boolean isTokenExpired(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         return extractExpiration(token).before(new Date());
     }
 

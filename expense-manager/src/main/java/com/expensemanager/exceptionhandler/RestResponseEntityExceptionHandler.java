@@ -11,6 +11,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.expensemanager.exception.LoginCredentialWrongException;
+import com.expensemanager.exception.MonthlyBudgetException;
 import com.expensemanager.exception.NullValueException;
 import com.expensemanager.exception.UsernameAlreadyExistException;
 import com.expensemanager.exception.UsernameNotFoundException;
@@ -49,5 +50,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         ErrorMessage message = new ErrorMessage(LocalDateTime.now().toString(), HttpStatus.NOT_FOUND, exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    }
+
+    @ExceptionHandler(MonthlyBudgetException.class)
+    public ResponseEntity<ErrorMessage> monthlyBudgetAlreadyAddedException(MonthlyBudgetException exception,
+            WebRequest request) {
+        ErrorMessage message = new ErrorMessage(LocalDateTime.now().toString(), HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
     }
 }
