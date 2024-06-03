@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.expensemanager.entity.Expenses;
 import com.expensemanager.exception.MonthlyBudgetException;
 import com.expensemanager.exception.UsernameNotFoundException;
+import com.expensemanager.models.ExpenseResponse;
+import com.expensemanager.models.ProfileLossResponse;
 import com.expensemanager.servise.MonthlyExpenseService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,10 +39,10 @@ public class MonthlyExpenseController {
         return ResponseEntity.ok().body(monthlyExpenseService.findExpensesByYearAndMonth(year, month, token));
     }
     
-    @PutMapping("/updateexpenses/{year}/{month}")
-    public ResponseEntity<Expenses> updateExpenses(@PathVariable("year") int year, @PathVariable("month") int month,@RequestBody Expenses expenses, @RequestHeader("Authorization") String token) throws UsernameNotFoundException, MonthlyBudgetException {
+    @PutMapping("/updateexpenses")
+    public ResponseEntity<ExpenseResponse> updateExpenses(@RequestBody Expenses expenses, @RequestHeader("Authorization") String token) throws UsernameNotFoundException, MonthlyBudgetException {
 
-        return ResponseEntity.ok().body(monthlyExpenseService.updateExpanses(year, month, expenses, token));
+        return ResponseEntity.ok().body(monthlyExpenseService.updateExpanses(expenses, token));
     }
 
     @GetMapping("/expenses/{date}")
@@ -48,5 +50,11 @@ public class MonthlyExpenseController {
         
         return ResponseEntity.ok().body(monthlyExpenseService.getExpensesByDate(date, token));
     }
-    
+
+    @GetMapping("/expenses/profitloss")
+    public ResponseEntity<ProfileLossResponse> getProfitOrLoss(@RequestHeader("Authorization") String token) {
+        
+        return ResponseEntity.ok().body(monthlyExpenseService.getProfiteOrLoss(token));
+    }
+ 
 }

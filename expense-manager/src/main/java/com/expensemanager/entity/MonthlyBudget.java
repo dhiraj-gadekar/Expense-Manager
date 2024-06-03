@@ -29,13 +29,15 @@ public class MonthlyBudget {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    private double amount;
+    private double monthlyBudget;
+
+    private double usedBudget;
 
     private LocalDate date;
 
     @Enumerated(value = EnumType.STRING)
     private Month month;
-   
+
     private int userId;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

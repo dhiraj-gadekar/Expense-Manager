@@ -14,6 +14,8 @@ import com.expensemanager.entity.MonthlyBudget;
 import com.expensemanager.entity.User;
 import com.expensemanager.exception.MonthlyBudgetException;
 import com.expensemanager.exception.UsernameNotFoundException;
+import com.expensemanager.models.ExpenseResponse;
+import com.expensemanager.models.ProfileLossResponse;
 import com.expensemanager.repository.MonthlyBudgetRepository;
 import com.expensemanager.repository.UserRepository;
 import com.expensemanager.utils.Month;
@@ -52,11 +54,11 @@ public class MonthlyExpenseServiceImpl implements MonthlyExpenseService {
             throw new MonthlyBudgetException("This month budget already added");
         }
         MonthlyBudget monthlyBudget = new MonthlyBudget();
-        monthlyBudget.setAmount(budget);
+        monthlyBudget.setMonthlyBudget(budget);
+        monthlyBudget.setUsedBudget(0);
         monthlyBudget.setDate(LocalDate.now());
         monthlyBudget.setUserId(user.getUserId());
         monthlyBudget.setMonth(Month.values()[LocalDate.now().getMonthValue() - 1]);
-
         
         user.getMonthsList().add(monthlyBudget);
         userRepository.save(user);
@@ -86,7 +88,7 @@ public class MonthlyExpenseServiceImpl implements MonthlyExpenseService {
     }
 
     @Override
-    public Expenses updateExpanses(int year, int month, Expenses expenses, String token) throws UsernameNotFoundException, MonthlyBudgetException {
+    public ExpenseResponse updateExpanses(Expenses expenses, String token) throws UsernameNotFoundException, MonthlyBudgetException {
 
         String username = jwtService.extractUsername(token);
 
@@ -95,28 +97,40 @@ public class MonthlyExpenseServiceImpl implements MonthlyExpenseService {
             throw new UsernameNotFoundException("User Not Found");
 
         User user = optionalUser.get();
-        LocalDate monthStartDate = LocalDate.of(year, month, 1).with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate monthLastDate = LocalDate.of(year, month, 1).with(TemporalAdjusters.lastDayOfMonth());
+        LocalDate monthStartDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate monthLastDate = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+        
+        if(!((expenses.getDate().isAfter(monthStartDate) || expenses.getDate().isEqual(monthStartDate)) && (expenses.getDate().isBefore(LocalDate.now()) || expenses.getDate().equals(LocalDate.now())))) {
 
+            throw new MonthlyBudgetException("Invalid Date " + expenses.getDate());
+        }
         Optional<MonthlyBudget> optionalBudget = monthlyBudgetRepository.findMonthlyBudgetsByUserIdAndDateBetween(user.getUserId(),
                 monthStartDate, monthLastDate);
 
         if (optionalBudget.isEmpty()) {
             
-            throw new MonthlyBudgetException("Monthly Budget Not Added");
+            throw new MonthlyBudgetException("Monthly Budget Not Added for " + expenses.getDate());
         }
         expenses.setMonthlyBudgetId(optionalBudget.get().getId());
         
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+
         MonthlyBudget monthlyBudget = optionalBudget.get();
-        double budget = monthlyBudget.getAmount() - expenses.getCost();
-        if (budget < 0) {
-            
-            throw new MonthlyBudgetException("Low Budget");
-        }
-        monthlyBudget.setAmount(budget);
+        double budget = monthlyBudget.getUsedBudget() + expenses.getCost();
+        monthlyBudget.setUsedBudget(budget);
         monthlyBudget.getExpenses().add(expenses);
         monthlyBudgetRepository.save(monthlyBudget);
-        return expenses;
+
+        if (budget > monthlyBudget.getMonthlyBudget()) 
+            expenseResponse.setMessage("Low Budget");
+        else
+            expenseResponse.setMessage("");
+        
+        expenseResponse.setCost(expenses.getCost());
+        expenseResponse.setDate(expenses.getDate());
+        expenseResponse.setItem(expenses.getItem());
+        
+        return expenseResponse;
     }
 
     @Override
@@ -130,5 +144,36 @@ public class MonthlyExpenseServiceImpl implements MonthlyExpenseService {
 
         Set<Expenses> expensesByDate = monthlyBudgetRepository.findExpensesByDate(optionalUser.get().getUserId(), date);
         return expensesByDate;
+    }
+
+    @Override
+    public ProfileLossResponse getProfiteOrLoss(String token) {
+
+        String username = jwtService.extractUsername(token);
+
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+
+        LocalDate firstDayOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate lastDayOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+
+        ProfileLossResponse profileLossResponse = new ProfileLossResponse();
+        if (optionalUser.isPresent()) {
+            
+            MonthlyBudget monthlyBudget = monthlyBudgetRepository.findMonthlyBudgetsByUserIdAndDateBetween(optionalUser.get().getUserId(), firstDayOfMonth, lastDayOfMonth).get();
+
+            double mb = monthlyBudget.getMonthlyBudget();
+            double ub = monthlyBudget.getUsedBudget();
+
+            if ( mb >= ub) {
+                
+                profileLossResponse.setAmount(mb - ub);
+                profileLossResponse.setProfileOrLoss("Profit");
+            } else {
+
+                profileLossResponse.setAmount(ub - mb);
+                profileLossResponse.setProfileOrLoss("Loss");                
+            }
+        }
+        return profileLossResponse;
     }
 }
