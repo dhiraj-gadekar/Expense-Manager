@@ -1,5 +1,7 @@
 package com.expensemanager.servise;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,4 +27,13 @@ public class UserServiceImpl implements UserService {
         return true;
     }
     
+    public List<Integer> getAllUserIds() {
+        
+        Optional<List<Integer>> fetchAllUserIds = userRepository.fetchAllUserIds();
+        if (fetchAllUserIds.isPresent()) {
+
+            return fetchAllUserIds.get();
+        }
+        return new ArrayList<>();
+    }
 }

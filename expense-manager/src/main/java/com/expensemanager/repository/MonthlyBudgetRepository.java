@@ -21,7 +21,7 @@ public interface MonthlyBudgetRepository extends JpaRepository<MonthlyBudget, In
     @Query("SELECT mb.expenses FROM MonthlyBudget mb " +
             "WHERE mb.date BETWEEN :startDate AND :endDate " +
             "AND mb.userId = :userId")
-    Set<Expenses> findExpensesBetweenDatesByUser(
+    Optional<Set<Expenses>> findExpensesBetweenDatesByUser(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("userId") int userId);

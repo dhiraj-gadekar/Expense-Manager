@@ -1,5 +1,3 @@
-package com.expensemanager;
-
 /*
  * The expense manager is a java program that helps the user to keep monthly accounts. Using the program, one can keep track of their personal profits, loss, and their expenses. The user of this program can keep track of their expense, make a note of the date in which their expense is done. Likewise, they can also enter the budget for every month so that they can easily be notified if their expense made exceeds their budget for the month or not. Please see below for the full features of the software.
 
@@ -14,15 +12,31 @@ User can enter a month to view all the expenses done on the specific month
 Users can get the expenses details made from the time, the budget has been reset
  */
 
+package com.expensemanager;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import com.expensemanager.servise.MonthlyExpenseService;
+
 @SpringBootApplication
 @EnableJpaRepositories
-public class ExpenseManagerApplication {
+public class ExpenseManagerApplication implements CommandLineRunner {
 
+	@Autowired
+	private MonthlyExpenseService monthlyExpenseService;
 	public static void main(String[] args) {
 		SpringApplication.run(ExpenseManagerApplication.class, args);
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+
+		
+		monthlyExpenseService.expenseReportGenerator();
 	}
 }

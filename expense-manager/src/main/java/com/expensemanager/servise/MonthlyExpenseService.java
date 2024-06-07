@@ -19,5 +19,7 @@ public interface MonthlyExpenseService {
 
     Set<Expenses> getExpensesByDate(LocalDate date, String token) throws UsernameNotFoundException;
 
-    ProfileLossResponse getProfiteOrLoss(String token);
+    ProfileLossResponse getProfiteOrLoss(int userId, LocalDate date);
+
+    void expenseReportGenerator();
 }
