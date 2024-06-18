@@ -3,5 +3,5 @@
 "2500.0","2024-05-01","Food"
 "8000.0","2024-05-01","Cycle"
 
-"Profit/Loss","Amount"
-"Loss","500.0"
+"Profit/Loss","Amount","Total Budget"
+"Loss","500.0","15000.0"

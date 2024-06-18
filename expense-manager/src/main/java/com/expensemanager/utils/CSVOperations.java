@@ -31,7 +31,7 @@ public class CSVOperations {
             csvWriter.writeAll(list);
             csvWriter.writeNext(new String[] {});
 
-            csvWriter.writeNext(new String[] { "Profit/Loss", "Amount" });
+            csvWriter.writeNext(new String[] { "Profit/Loss", "Amount", "Total Budget"});
             csvWriter.writeNext(profitLossArray);
             csvWriter.close();
         } catch (IOException e) {

@@ -14,15 +14,27 @@ Users can get the expenses details made from the time, the budget has been reset
 
 package com.expensemanager;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import com.expensemanager.servise.MonthlyExpenseService;
+
 @SpringBootApplication
 @EnableJpaRepositories
-public class ExpenseManagerApplication {
+public class ExpenseManagerApplication implements CommandLineRunner {
 
+	@Autowired
+	private MonthlyExpenseService monthlyExpenseService;
 	public static void main(String[] args) {
 		SpringApplication.run(ExpenseManagerApplication.class, args);
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		
+		monthlyExpenseService.expenseReportGenerator();
 	}
 }

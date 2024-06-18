@@ -203,7 +203,9 @@ public class MonthlyExpenseServiceImpl implements MonthlyExpenseService {
 
             Optional<Set<Expenses>> optionalExpensesList = monthlyBudgetRepository
                     .findExpensesBetweenDatesByUser(startDateOfMonth, lastDateOfMoth, userId);
-            if (optionalExpensesList.isPresent()) {
+            
+            Optional<MonthlyBudget> monthlyBudgets = monthlyBudgetRepository.findMonthlyBudgetsByUserIdAndDateBetween(userId, startDateOfMonth, date);
+            if (optionalExpensesList.isPresent() && monthlyBudgets.isPresent()) {
 
                 Set<Expenses> expensesList = optionalExpensesList.get();
 
@@ -214,7 +216,7 @@ public class MonthlyExpenseServiceImpl implements MonthlyExpenseService {
 
                 ProfileLossResponse profiteOrLoss = getProfiteOrLoss(userId, date);
                 String[] profitLossArray = new String[] { profiteOrLoss.getProfileOrLoss(),
-                        String.valueOf(profiteOrLoss.getAmount()) };
+                        String.valueOf(profiteOrLoss.getAmount()),  String.valueOf(monthlyBudgets.get().getMonthlyBudget())};
                 csvOperations.writeDataAtCSVFile(arrayList, userId, profitLossArray);
             }
         });
